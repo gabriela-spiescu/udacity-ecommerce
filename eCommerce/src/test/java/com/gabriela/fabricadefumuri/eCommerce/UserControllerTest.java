@@ -3,6 +3,7 @@ package com.gabriela.fabricadefumuri.eCommerce;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.gabriela.fabricadefumuri.eCommerce.controller.UserController;
+import com.gabriela.fabricadefumuri.eCommerce.entity.Cart;
+import com.gabriela.fabricadefumuri.eCommerce.entity.Item;
 import com.gabriela.fabricadefumuri.eCommerce.entity.User;
 import com.gabriela.fabricadefumuri.eCommerce.repository.CartRepository;
 import com.gabriela.fabricadefumuri.eCommerce.repository.UserRepository;
@@ -36,6 +39,23 @@ public class UserControllerTest {
 		TestUtils.injectObject(userController, "userRepository", userRepo);
 		TestUtils.injectObject(userController, "cartRepository", cartRepo);
 		TestUtils.injectObject(userController, "bCryptPasswordEncoder", bCryptPasswordEncoder);
+	}
+	
+	private User getUser() {
+		User user = new User();
+		user.setId(1);
+		user.setUsername("myName");
+		user.setPassword("password");
+		List<User> users = new ArrayList<User>();
+		users.add(user);
+		
+		Cart cart = new Cart();
+		cart.setId(1L);
+		cart.setUser(user);
+		cart.setTotal(BigDecimal.ZERO);
+		cart.setItems(new ArrayList<Item>());
+		user.setCart(cart);
+		return user;
 	}
 	
 	@Test
@@ -63,12 +83,9 @@ public class UserControllerTest {
 		assertEquals(400, reponse2.getStatusCodeValue());
 	}
 	
-//	@Test
+	@Test
 	public void verify_findByUserName() {
-		User user = new User();
-		user.setId(1);
-		user.setUsername("myName");
-		user.setPassword("password");
+		User user = getUser();
 		List<User> users = new ArrayList<User>();
 		users.add(user);
 		Mockito.when(userRepo.findByUsername("myName")).thenReturn(user);
@@ -85,10 +102,7 @@ public class UserControllerTest {
 	
 	@Test
 	public void verify_findById() {
-		User user = new User();
-		user.setId(1);
-		user.setUsername("myName");
-		user.setPassword("password");
+		User user = getUser();
 		List<User> users = new ArrayList<User>();
 		users.add(user);
 		Optional<User> uo = Optional.of(user);
